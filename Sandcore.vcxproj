@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{e447c122-96c0-4f47-9be8-10294e1b7742}</ProjectGuid>
+    <RootNamespace>Sandcore</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Sandcore\Sandcore\Libraries\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Sandcore\Sandcore\Libraries\SFML\libs_d;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Sandcore\Sandcore\Libraries\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Sandcore\Sandcore\Libraries\SFML\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio.lib;sfml-graphics.lib;sfml-main.lib;sfml-network.lib;sfml-system.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Sandcore\Sandcore\Libraries\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Sandcore\Sandcore\Libraries\SFML\libs_d;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio-d.lib;sfml-graphics-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>D:\Sandcore\Sandcore\Libraries\SFML\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>D:\Sandcore\Sandcore\Libraries\SFML\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>sfml-audio.lib;sfml-graphics.lib;sfml-main.lib;sfml-network.lib;sfml-system.lib;sfml-window.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Application\Application.cpp" />
+    <ClCompile Include="Source\Application\Application.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\EnterButton\EnterButton.cpp" />
+    <ClCompile Include="Source\Application\Interface\Button\EnterButton\EnterButton.ixx" />
+    <ClCompile Include="Source\Additional\Clock\Clock.cpp" />
+    <ClCompile Include="Source\Additional\Clock\Clock.ixx" />
+    <ClCompile Include="Source\Additional\SimplexNoise\SimplexNoise.cpp" />
+    <ClCompile Include="Source\Additional\SimplexNoise\SimplexNoise.ixx" />
+    <ClCompile Include="Source\Additional\VectorThree\VectorThree.cpp" />
+    <ClCompile Include="Source\Additional\VectorThree\VectorThree.ixx" />
+    <ClCompile Include="Source\Additional\VectorThree\VectorThreeHash.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\Button.cpp" />
+    <ClCompile Include="Source\Application\Interface\Button\Button.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\OptionsButton\OptionsButton.cpp" />
+    <ClCompile Include="Source\Application\Interface\Button\OptionsButton\OptionsButton.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\TextButton\TextButton.cpp" />
+    <ClCompile Include="Source\Application\Interface\Button\TextButton\TextButton.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\WorldButton\WorldButton.cpp" />
+    <ClCompile Include="Source\Application\Interface\Button\WorldButton\WorldButton.ixx" />
+    <ClCompile Include="Source\Application\Interface\Button\WorldButton\WorldButtonClickIdentification.ixx" />
+    <ClCompile Include="Source\Application\Resources\Resources.cpp" />
+    <ClCompile Include="Source\Application\Resources\ResourcesIdentification.ixx" />
+    <ClCompile Include="Source\Application\Resources\Resources.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneManager\SceneManager.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneManager\SceneManager.ixx" />
+    <ClCompile Include="Source\Application\Scene\Scene.cpp" />
+    <ClCompile Include="Source\Application\Scene\Scene.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Controls\Controls.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Controls\Controls.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Game.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Game.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Interface\InGameMenu\InGameMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Interface\InGameMenu\InGameMenu.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Interface\Interface.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Interface\Interface.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Render\Camera\Camera.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Render\Camera\Camera.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Render\Render.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\Render\Render.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\TexturePackage\TexturePackage.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Game\TexturePackage\TexturePackage.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\GenerateWorldMenu\GenerateWorldMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\GenerateWorldMenu\GenerateWorldMenu.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\MainMenu\MainMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\MainMenu\MainMenu.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\SettingsMenu\SettingsMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\SettingsMenu\SettingsMenu.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\SingleplayerMenu\SingleplayerMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\SingleplayerMenu\SingleplayerMenu.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\WorldSettingsMenu\DeleteWorld\DeleteWorld.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\WorldSettingsMenu\DeleteWorld\DeleteWorld.ixx" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\WorldSettingsMenu\WorldSettingsMenu.cpp" />
+    <ClCompile Include="Source\Application\Scene\SceneStorage\Menus\WorldSettingsMenu\WorldSettingsMenu.ixx" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\World\Bounds\Bounds.ixx" />
+    <ClCompile Include="Source\World\Chunk\Block\Block.cpp" />
+    <ClCompile Include="Source\World\Chunk\Block\Block.ixx" />
+    <ClCompile Include="Source\World\Chunk\Block\BlockIdentification.ixx" />
+    <ClCompile Include="Source\World\Chunk\Chunk.cpp" />
+    <ClCompile Include="Source\World\Chunk\Chunk.ixx" />
+    <ClCompile Include="Source\World\DeleteDirectory\DeleteDirectory.cpp" />
+    <ClCompile Include="Source\World\Entity\ActionCondition\ActionCondition.ixx" />
+    <ClCompile Include="Source\World\Entity\Entity.cpp" />
+    <ClCompile Include="Source\World\Entity\Entity.ixx" />
+    <ClCompile Include="Source\World\Entity\EntityAI\EntityAI.cpp" />
+    <ClCompile Include="Source\World\Entity\EntityAI\EntityAI.ixx" />
+    <ClCompile Include="Source\World\Entity\EntityIdentification.ixx" />
+    <ClCompile Include="Source\World\Entity\MoveCondition\MoveCondition.cpp" />
+    <ClCompile Include="Source\World\Entity\MoveCondition\MoveCondition.ixx" />
+    <ClCompile Include="Source\World\CreateDirectory\CreateDirectory.cpp" />
+    <ClCompile Include="Source\World\Generator\Generator.cpp" />
+    <ClCompile Include="Source\World\Generator\Generator.ixx" />
+    <ClCompile Include="Source\World\Parameters\Parameters.cpp" />
+    <ClCompile Include="Source\World\Parameters\Parameters.ixx" />
+    <ClCompile Include="Source\World\Player\Player.cpp" />
+    <ClCompile Include="Source\World\Player\Player.ixx" />
+    <ClCompile Include="Source\World\World.cpp" />
+    <ClCompile Include="Source\World\World.ixx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Source\settings.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

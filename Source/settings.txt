@@ -1,0 +1,6 @@
+username WeededMuffin385
+password VerySmartPassword
+
+texturePackage D:\Sandcore\TexturePackage64
+userData D:\Sandcore\SandcoreUserData
+resources D:\Sandcore\Resources
