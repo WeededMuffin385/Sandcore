@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "sandcore_client",
+    "sandcore_server"
+]
