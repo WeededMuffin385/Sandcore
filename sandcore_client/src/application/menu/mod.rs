@@ -1,6 +1,7 @@
 mod state;
 mod main_menu;
 mod settings_menu;
+mod multiplayer_menu;
 
 use bevy::prelude::*;
 use bevy::app::{App, Startup, Update};
@@ -11,6 +12,7 @@ use super::state::ApplicationState;
 
 use settings_menu::SettingsMenu;
 use main_menu::MainMenu;
+use crate::application::menu::multiplayer_menu::MultiplayerMenu;
 
 pub struct Menu;
 
@@ -23,6 +25,7 @@ impl Plugin for Menu {
 
             .add_plugins(MainMenu)
             .add_plugins(SettingsMenu)
+            .add_plugins(MultiplayerMenu)
         ;
     }
 }

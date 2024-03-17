@@ -36,10 +36,10 @@ fn on_exit(
 
 fn update_ui(
     mut contexts: EguiContexts,
-    mut next_state: ResMut<NextState<SettingsMenuState>>,
-
     mut settings: ResMut<Settings>,
+
     current_state: Res<State<SettingsMenuState>>,
+    mut next_state: ResMut<NextState<SettingsMenuState>>,
 
     mut next_menu_state: ResMut<NextState<MenuState>>,
 ) {
@@ -83,7 +83,7 @@ fn update_ui(
 }
 
 fn show_general_settings(ui: &mut Ui, settings: &mut ResMut<Settings>) {
-    ui.style_mut().spacing.slider_width = ui.available_width() * 0.8;
+    ui.style_mut().spacing.slider_width = ui.available_width() * 0.5;
 
     ui.horizontal(|ui| {
         let slider = egui::widgets::Slider::new(&mut settings.font_size, 0.0..=60.0).text("font size");

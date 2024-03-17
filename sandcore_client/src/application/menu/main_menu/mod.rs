@@ -35,7 +35,7 @@ fn update_ui(
 
         ui.vertical_centered(|ui|{
             if ui.add_sized(button_size, egui::widgets::Button::new("Multiplayer")).clicked() {
-
+                next_state.set(MenuState::MultiplayerMenu);
             }
 
             if ui.add_sized(button_size, egui::widgets::Button::new("Settings")).clicked() {

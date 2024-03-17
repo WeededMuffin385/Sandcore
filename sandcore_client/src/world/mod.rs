@@ -1,13 +1,8 @@
-mod creature;
+use creatures::Creatures;
 
+mod creatures;
+
+#[derive(Default)]
 pub struct World {
-
-}
-
-impl World {
-    pub fn new() -> Self {
-        Self {
-
-        }
-    }
+    creatures: Creatures,
 }

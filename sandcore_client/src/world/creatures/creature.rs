@@ -1,5 +1,5 @@
 use euclid::default::Vector2D;
 
-struct Creature {
+pub struct Creature {
     position: Vector2D<f32>,
 }

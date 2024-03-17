@@ -1,8 +1,8 @@
-mod account;
+mod client;
 
 use std::net::{TcpListener, ToSocketAddrs};
 use tokio::runtime::Runtime;
-use account::Account;
+use client::Client;
 use crate::world::World;
 
 pub struct Server {
@@ -17,8 +17,8 @@ impl Server {
         for stream in self.listener.incoming() {
             if let Ok(stream) = stream {
                 let sender = self.world.creatures.spawn();
-                let account = Account::new(stream, sender);
-                account.run(self.runtime.handle());
+                let client = Client::new(stream, sender);
+                client.run(self.runtime.handle());
             } else {
                 println!("Connection failed");
             }

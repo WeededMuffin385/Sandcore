@@ -1,3 +1,6 @@
+mod renderer;
+mod client;
+
 use bevy::app::{App, Update};
 use bevy::prelude::{Commands, Component, EventReader, in_state, IntoSystemConfigs, OnEnter, OnExit, Plugin, Query};
 use bevy_egui::{egui, EguiContexts};
