@@ -37,9 +37,9 @@ impl Client {
     }
 
     fn update_stream(&mut self) {
-        let mut header = Message::default();
-        header.read(&mut self.stream);
-        let message = serde_json::from_slice::<MessageClient>(&header.earn()).expect("Unable to get message from client");
+        let mut message = Message::default();
+        message.read(&mut self.stream);
+        let message = serde_json::from_slice::<MessageClient>(&message.get()).expect("Unable to get message from client");
 
 
         match message {

@@ -19,7 +19,7 @@ impl Client {
     }
 
     pub fn update_stream(&mut self) {
-        let mut header = Message::default();
-        header.read(&mut self.stream);
+        let mut message = Message::default();
+        message.read(&mut self.stream);
     }
 }

@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::app::{App, AppExit, Update};
 use bevy_egui::{egui, EguiContexts};
 use crate::application::menu::state::MenuState;
+use crate::application::state::ApplicationState;
 
 pub struct MainMenu;
 
@@ -9,10 +10,9 @@ pub struct MainMenu;
 impl Plugin for MainMenu {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, update_ui.run_if(in_state(MenuState::MainMenu)))
-
-
-        ;
+            .add_systems(Update, update_ui
+                .run_if(in_state(ApplicationState::Menu))
+                .run_if(in_state(MenuState::MainMenu)));
     }
 }
 

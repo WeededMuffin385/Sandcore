@@ -5,7 +5,7 @@ use crate::application::{Application};
 
 pub mod client;
 mod world;
-mod application;
+pub mod application;
 
 fn main() {
     App::new()

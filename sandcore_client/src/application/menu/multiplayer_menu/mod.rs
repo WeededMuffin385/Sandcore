@@ -1,13 +1,20 @@
-mod state;
-mod event;
+pub mod event;
+mod servers;
 
+use egui::Rect;
+use egui::Pos2;
+use std::collections::LinkedList;
+use std::mem;
 use bevy::app::{App, Startup, Update};
+use bevy::asset::AssetContainer;
 use bevy::prelude::{EventWriter, in_state, IntoSystemConfigs, NextState, Plugin, Res, ResMut, Resource, State};
 use bevy_egui::{egui, EguiContexts};
-use bevy_egui::egui::Ui;
+use bevy_egui::egui::{CentralPanel, Color32, Frame, Margin, Rounding, Vec2};
 use crate::application::menu::state::MenuState;
-use state::MultiplayerMenuState;
 use crate::application::menu::multiplayer_menu::event::ConnectionEvent;
+use crate::application::state::ApplicationState;
+use servers::Servers;
+use crate::application::menu::multiplayer_menu::servers::Server;
 
 
 pub struct MultiplayerMenu;
@@ -15,95 +22,148 @@ pub struct MultiplayerMenu;
 impl Plugin for MultiplayerMenu {
     fn build(&self, app: &mut App) {
         app
-            .init_state::<MultiplayerMenuState>()
-            .init_resource::<Input>()
+            .init_resource::<Servers>()
+            .init_resource::<Settings>()
             .add_event::<ConnectionEvent>()
-            .add_systems(Update, update_ui.run_if(in_state(MenuState::MultiplayerMenu)))
 
-        ;
+            .add_systems(Update, (
+                    update_ui_server_settings,
+                    update_ui_server_list,
+            ).chain().run_if(in_state(ApplicationState::Menu)).run_if(in_state(MenuState::MultiplayerMenu)));
     }
 }
 
 #[derive(Resource, Default)]
-struct Input {
-    server_name: String,
-    server_address: String,
+struct Settings {
+    index: Option<usize>,
+    server: Server,
 }
 
-fn update_ui(
+fn update_ui_server_list(
     mut contexts: EguiContexts,
-    mut next_menu_state: ResMut<NextState<MenuState>>,
-
-    current_state: Res<State<MultiplayerMenuState>>,
-    mut next_state: ResMut<NextState<MultiplayerMenuState>>,
-
-    mut input: ResMut<Input>,
-
     mut connection_events: EventWriter<ConnectionEvent>,
+    mut next_application_state: ResMut<NextState<ApplicationState>>,
+
+    mut servers: ResMut<Servers>,
+    mut settings: ResMut<Settings>,
 ) {
     let ctx = contexts.ctx_mut();
 
-    egui::SidePanel::right("right_panel").exact_width(ctx.available_rect().width() * 0.2).show(ctx, |ui|{
-        let button_size = [ui.available_width(), 20.0];
+    egui::CentralPanel::default().show(ctx, |ui| {
+        egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
+            ui.vertical(|ui| {
 
-        if ui.add_sized(button_size, egui::Button::new("Server List")).clicked() {
-            next_state.set(MultiplayerMenuState::ServerList);
-        }
+                let width = ui.available_width();
+                let size = [width * 0.6, 20.0];
+                let size_compact = [width * 0.2, 20.0];
 
-        if ui.add_sized(button_size, egui::Button::new("Add New Server")).clicked() {
-            next_state.set(MultiplayerMenuState::AddNewServer);
-        }
 
-        ui.add_space(ui.available_height() - button_size[1]);
+                let mut garbage = Vec::new();
 
-        if ui.add_sized(button_size, egui::Button::new("Save'n'back")).clicked() {
-            next_menu_state.set(MenuState::MainMenu);
-        }
-    });
+                let frame = egui::Frame{
+                    fill: egui::Color32::from_rgb(0,255,0),
+                    inner_margin: Margin::same(width * 0.05),
+                    rounding: Rounding::same(15.0),
+                    .. Default::default()
+                };
 
-    egui::CentralPanel::default().show(ctx, |ui|{
-       match current_state.get() {
-           MultiplayerMenuState::ServerList => {show_server_list(ui); }
-           MultiplayerMenuState::AddNewServer => {show_add_new_server(ui, &mut input)}
-       }
-    });
-}
+                for (index, server) in servers.servers.iter().enumerate() {
+                    //frame.show(ui, |ui|{
+                        ui.horizontal(|ui|{
+                            if ui.add_sized(size, egui::widgets::Button::new(format!("{} [{}]", &server.name, &server.address))).clicked() {
+                                connection_events.send(ConnectionEvent::new(server.address.clone()));
+                                next_application_state.set(ApplicationState::Gameplay);
+                            }
 
-fn show_server_list(
-    ui: &mut Ui,
-) {
-    egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui|{
-        ui.vertical(|ui|{
-            let width = ui.available_width();
-            let server_button_size = [width * 0.5, 20.0];
-            let setting_button_size = [width * 0.2, 20.0];
+                            if ui.add_sized(size_compact, egui::widgets::Button::new("settings")).clicked() {
+                                settings.index = Some(index);
+                                settings.server = server.clone();
+                            }
 
-            for i in 1..=50 {
-                ui.horizontal(|ui|{
-                    if ui.add_sized(server_button_size, egui::widgets::Button::new(format!("server name {i}"))).clicked() {
-                        // connection_events.send()
-                    }
+                            if ui.add_sized(size_compact, egui::widgets::Button::new("delete")).clicked() {
+                                garbage.push(index);
+                            }
+                        });
+                    //});
+                }
 
-                    ui.add_sized(setting_button_size, egui::widgets::Button::new(format!("settings")));
-                    ui.add_sized(setting_button_size, egui::widgets::Button::new(format!("delete")));
-                });
-            }
+                for index in garbage {
+                    servers.servers.remove(index);
+                }
+            });
         });
     });
 }
 
-fn show_add_new_server(
-    ui: &mut Ui,
-    input: &mut ResMut<Input>,
+fn update_ui_server_settings(
+    mut contexts: EguiContexts,
+
+    mut servers: ResMut<Servers>,
+    mut settings: ResMut<Settings>,
+    mut next_menu_state: ResMut<NextState<MenuState>>,
 ) {
-    let width = ui.available_width();
-    let form_size = [width, 20.0];
+    let ctx = contexts.ctx_mut();
 
-    ui.vertical_centered(|ui|{
-        ui.label("server name");
-        ui.add_sized(form_size, egui::widgets::TextEdit::singleline(&mut input.server_name));
+    egui::SidePanel::right("right_panel").exact_width(ctx.screen_rect().width() * 0.2).show(ctx, |ui| {
+        let size = [ui.available_width() * 0.95, 20.0];
 
-        ui.label("server address");
-        ui.add_sized(form_size, egui::widgets::TextEdit::singleline(&mut input.server_address));
+        ui.vertical_centered(|ui|{
+            ui.label("server name");
+        });
+        ui.vertical(|ui| {
+            ui.add_sized(size, egui::widgets::TextEdit::singleline(&mut settings.server.name));
+        });
+
+        ui.vertical_centered(|ui| {
+            ui.label("server address");
+        });
+        ui.vertical(|ui|{
+            ui.add_sized(size, egui::widgets::TextEdit::singleline(&mut settings.server.address));
+        });
+
+        ui.vertical_centered(|ui| {
+            ui.label("username");
+        });
+        ui.vertical(|ui|{
+            ui.add_sized(size, egui::widgets::TextEdit::singleline(&mut settings.server.username));
+        });
+
+        ui.vertical_centered(|ui| {
+            ui.label("password");
+        });
+        ui.vertical(|ui|{
+            ui.add_sized(size, egui::widgets::TextEdit::singleline(&mut settings.server.password).password(true));
+        });
+
+        ui.vertical(|ui|{
+            if ui.add_sized(size, egui::Button::new("save server")).clicked() {
+                if let Some(index) = settings.index {
+                    servers.servers[index] = settings.server.clone();
+                } else {
+                    let mut server = Default::default();
+                    mem::swap(&mut server, &mut settings.server);
+                    servers.servers.push(server);
+                }
+
+            }
+
+            if ui.add_sized(size, egui::Button::new("clean")).clicked() {
+                settings.server = Default::default();
+                settings.index = None;
+            }
+        });
+
+        ui.vertical(|ui|{
+            ui.add_space(ui.available_height() - size[1]);
+
+            if ui.add_sized(size, egui::Button::new("Save'n'back")).clicked() {
+                next_menu_state.set(MenuState::MainMenu);
+            }
+        });
+
+
+
+
+
     });
 }

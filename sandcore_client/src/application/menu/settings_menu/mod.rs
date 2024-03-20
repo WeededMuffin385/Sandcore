@@ -8,6 +8,7 @@ use bevy_egui::egui::Ui;
 use settings::Settings;
 use crate::application::menu::settings_menu::state::SettingsMenuState;
 use crate::application::menu::state::MenuState;
+use crate::application::state::ApplicationState;
 
 pub struct SettingsMenu;
 impl Plugin for SettingsMenu {
@@ -17,7 +18,10 @@ impl Plugin for SettingsMenu {
             .init_resource::<Settings>()
             .add_systems(OnEnter(MenuState::SettingsMenu), on_enter)
             .add_systems(OnExit(MenuState::SettingsMenu), on_exit)
-            .add_systems(Update, update_ui.run_if(in_state(MenuState::SettingsMenu)))
+            .add_systems(Update, update_ui
+                .run_if(in_state(MenuState::SettingsMenu))
+                .run_if(in_state(ApplicationState::Menu))
+            )
         ;
     }
 }

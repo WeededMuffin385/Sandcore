@@ -1,8 +1,10 @@
 use bevy::prelude::States;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum MultiplayerMenuState {
+pub enum ConnectionState {
     #[default]
-    ServerList,
-    AddNewServer,
+    Waiting,
+    Progress,
+    Success,
+    Failure,
 }

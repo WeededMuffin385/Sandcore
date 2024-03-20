@@ -1,10 +1,9 @@
 use bevy::prelude::States;
 
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
-pub enum MenuState {
+pub enum GameplayState {
     #[default]
     None,
-    MainMenu,
-    SettingsMenu,
-    MultiplayerMenu,
+    Game,
+    Connection,
 }

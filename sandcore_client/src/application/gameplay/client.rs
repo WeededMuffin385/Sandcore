@@ -1,17 +1,15 @@
-use std::io;
-use std::net::ToSocketAddrs;
-use bevy::prelude::Component;
+use bevy::prelude::Resource;
 use crate::client::Client;
 
-#[derive(Component)]
-pub struct ClientComponent {
+#[derive(Resource)]
+pub struct GameplayClient {
     pub client: Client,
 }
 
-impl ClientComponent {
-    pub fn new(addr: impl ToSocketAddrs) -> io::Result<Self> {
-        let client = Client::new(addr)?;
-
-        Ok(Self { client })
+impl GameplayClient {
+    pub fn new(client: Client) -> Self {
+        Self {
+            client,
+        }
     }
 }

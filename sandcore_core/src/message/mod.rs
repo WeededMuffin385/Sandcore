@@ -27,7 +27,7 @@ impl Message {
         self.read_body(stream);
     }
 
-    pub fn earn(&self) -> &Vec<u8> {
+    pub fn get(&self) -> &Vec<u8> {
         &self.body
     }
 }

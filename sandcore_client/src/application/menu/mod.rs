@@ -1,7 +1,7 @@
-mod state;
+pub mod state;
 mod main_menu;
 mod settings_menu;
-mod multiplayer_menu;
+pub mod multiplayer_menu;
 
 use bevy::prelude::*;
 use bevy::app::{App, Startup, Update};
@@ -19,7 +19,7 @@ pub struct Menu;
 impl Plugin for Menu {
     fn build(&self, app: &mut App) {
         app
-            .init_state::<MenuState>()
+            .insert_state(MenuState::MainMenu)
             .add_systems(OnEnter(ApplicationState::Menu), on_enter)
             .add_systems(OnExit(ApplicationState::Menu), on_exit)
 
@@ -30,10 +30,7 @@ impl Plugin for Menu {
     }
 }
 
-fn on_enter(
-    mut next_state: ResMut<NextState<MenuState>>,
-) {
-    next_state.set(MenuState::MainMenu);
+fn on_enter() {
 }
 
 fn on_exit(

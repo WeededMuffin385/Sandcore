@@ -1,6 +1,6 @@
+pub mod gameplay;
+pub mod menu;
 pub mod state;
-mod gameplay;
-mod menu;
 
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::asset::AssetServer;
