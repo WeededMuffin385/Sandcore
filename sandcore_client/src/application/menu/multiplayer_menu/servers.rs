@@ -1,5 +1,10 @@
-use bevy::prelude::Resource;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy::ecs::reflect::ReflectResource;
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
+use bevy::prelude::{Reflect, Resource, TypePath};
 use bevy_egui::egui::Color32;
+use bevy_inspector_egui::InspectorOptions;
+use rand::Rng;
 
 #[derive(Resource)]
 pub struct Servers {
@@ -17,12 +22,18 @@ pub struct Server {
 
 impl Default for Server {
     fn default() -> Self {
+        let mut rng = rand::thread_rng();
+
+        let r = rng.gen();
+        let g = rng.gen();
+        let b = rng.gen();
+
         Self {
             name: Default::default(),
             address: Default::default(),
             username: Default::default(),
             password: Default::default(),
-            color: Color32::LIGHT_GREEN,
+            color: Color32::from_rgb(r, g, b),
         }
     }
 }

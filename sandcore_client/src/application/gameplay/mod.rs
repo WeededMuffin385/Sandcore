@@ -1,14 +1,14 @@
 mod state;
 mod connection;
 mod game;
-mod client;
+mod server;
 
 use bevy::app::{App, Update};
 use bevy::prelude::{Color, Commands, Component, EventReader, in_state, IntoSystemConfigs, NextState, OnEnter, OnExit, Plugin, Query, ResMut};
 use bevy_egui::{egui, EguiContexts};
-use crate::application::gameplay::client::GameplayClient;
 use crate::application::gameplay::connection::Connection;
 use crate::application::gameplay::game::Game;
+use crate::application::gameplay::server::ServerResource;
 use crate::application::gameplay::state::GameplayState;
 use crate::application::state::ApplicationState;
 use crate::application::menu::multiplayer_menu::event::ConnectionEvent;
@@ -38,6 +38,6 @@ fn on_exit(
     mut next_state: ResMut<NextState<GameplayState>>,
 ) {
     next_state.set(GameplayState::None);
-    commands.remove_resource::<GameplayClient>();
+    commands.remove_resource::<ServerResource>();
 }
 

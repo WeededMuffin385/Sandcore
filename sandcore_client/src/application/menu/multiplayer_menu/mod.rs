@@ -2,14 +2,12 @@ pub mod event;
 mod servers;
 
 use egui::Rect;
-use egui::Pos2;
-use std::collections::LinkedList;
 use std::mem;
 use bevy::app::{App, Startup, Update};
 use bevy::asset::AssetContainer;
 use bevy::prelude::{EventWriter, in_state, IntoSystemConfigs, NextState, Plugin, Res, ResMut, Resource, State};
 use bevy_egui::{egui, EguiContexts};
-use bevy_egui::egui::{Align, CentralPanel, Color32, Frame, Layout, Margin, Rounding, Vec2};
+use bevy_egui::egui::{Align, CentralPanel, Color32, Frame, Layout, Margin, Rounding, Slider, Ui, Vec2};
 use crate::application::menu::state::MenuState;
 use crate::application::menu::multiplayer_menu::event::ConnectionEvent;
 use crate::application::state::ApplicationState;
@@ -51,28 +49,24 @@ fn update_ui_server_list(
 
     egui::CentralPanel::default().show(ctx, |ui| {
         egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
-            let width = ui.available_width();
-            let size = [width * 0.6, 20.0];
             let mut garbage = Vec::new();
 
             for (index, server) in servers.servers.iter().enumerate() {
                 Frame::group(ui.style()).fill(server.color).rounding(5.0).show(ui, |ui|{
                     ui.horizontal(|ui|{
+                        let size = [ui.available_width() * 0.6, 20.0];
+
                         if ui.add_sized(size, egui::widgets::Button::new(format!("{} [{}]", &server.name, &server.address))).clicked() {
                             connection_events.send(ConnectionEvent::new(server.address.clone()));
                             next_application_state.set(ApplicationState::Gameplay);
                         }
 
-                        if ui.button("settings").clicked() {
+                        let size = [ui.available_width(), 20.0];
+
+                        if ui.add_sized(size, egui::widgets::Button::new("settings")).clicked() {
                             settings.index = Some(index);
                             settings.server = server.clone();
                         }
-
-                        if ui.button("delete").clicked() {
-                            garbage.push(index);
-                        }
-
-                        ui.add_space(ui.available_width());
                     });
                     ui.add_space(40.0);
                 });
@@ -100,42 +94,73 @@ fn update_ui_server_settings(
         let rect = Rect::from_min_size(ui.next_widget_position(), Vec2::new(width - 15.0, ui.available_height()));
         let mut ui = ui.child_ui(rect, *ui.layout());
 
+        let mut save_changes = {
+            if let Some(index) = settings.index {
+                servers.servers[index] = settings.server.clone();
+            }
+        };
+
         ui.vertical_centered_justified(|ui|{
             ui.label("server name");
-            ui.text_edit_singleline(&mut settings.server.name);
+            if ui.text_edit_singleline(&mut settings.server.name).changed() {
+                if let Some(index) = settings.index {
+                    servers.servers[index] = settings.server.clone();
+                }
+            }
 
             ui.label("server address");
-            ui.text_edit_singleline(&mut settings.server.address);
+            if ui.text_edit_singleline(&mut settings.server.address).changed() {
+                if let Some(index) = settings.index {
+                    servers.servers[index] = settings.server.clone();
+                }
+            }
 
             ui.label("username");
-            ui.text_edit_singleline(&mut settings.server.username);
+            if ui.text_edit_singleline(&mut settings.server.username).changed() {
+                if let Some(index) = settings.index {
+                    servers.servers[index] = settings.server.clone();
+                }
+            }
 
             ui.label("password");
-            ui.add(egui::widgets::TextEdit::singleline(&mut settings.server.password).password(true));
+            if ui.add(egui::widgets::TextEdit::singleline(&mut settings.server.password).password(true)).changed() {
+                if let Some(index) = settings.index {
+                    servers.servers[index] = settings.server.clone();
+                }
+            }
+
+            match settings.index {
+                None => {
+                    if ui.button("create").clicked() {
+                        servers.servers.push(settings.server.clone());
+                        settings.server = Default::default();
+                    }
+                }
+
+                Some(index) => {
+                    ui.columns(2, |columns|{
+                        columns[0].vertical_centered_justified(|ui|{
+                            if ui.button("delete").clicked() {
+                                servers.servers.remove(index);
+                                settings.server = Default::default();
+                                settings.index = None;
+                            }
+                        });
+
+                        columns[1].vertical_centered_justified(|ui|{
+                           if ui.button("close").clicked() {
+                               settings.server = Default::default();
+                               settings.index = None;
+                           }
+                        });
+
+                    });
+                }
+            }
 
             ui.color_edit_button_srgba(&mut settings.server.color);
         });
 
-        ui.columns(2, |columns|{
-            columns[0].vertical_centered_justified(|ui|{
-                if ui.button("save server").clicked() {
-                    if let Some(index) = settings.index {
-                        servers.servers[index] = settings.server.clone();
-                    } else {
-                        let mut server = Default::default();
-                        mem::swap(&mut server, &mut settings.server);
-                        servers.servers.push(server);
-                    }
-                }
-            });
-
-            columns[1].vertical_centered_justified(|ui|{
-                if ui.button("clean").clicked() {
-                    settings.server = Default::default();
-                    settings.index = None;
-                }
-            });
-        });
 
         ui.add_space(ui.available_height() - 20.0);
 

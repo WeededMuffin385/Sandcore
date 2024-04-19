@@ -1,53 +1,65 @@
-use std::io::Read;
 use std::net::TcpStream;
-use std::sync::mpsc::Sender;
-use tokio::runtime::Handle;
+use std::sync::mpsc;
 use sandcore_core::message::Message;
-use crate::world::creatures::creature::message::Message as CreatureMessage;
-use sandcore_core::message_client::MessageClient;
+use crate::world::creatures::creature::message::{Message as CreatureMessage, Request as CreatureRequest, Response as CreatureResponse};
+use crate::world::message::{Message as WorldMessage, Request as WorldRequest, Response as WorldResponse};
 
-type HeaderType = u32;
-const HEADER_SIZE: usize = core::mem::size_of::<HeaderType>();
+
+use sandcore_core::message_client::MessageClient;
+use sandcore_core::message_server::MessageServer;
 
 pub struct Client {
-    run: bool,
+    sender_creature: Option<mpsc::Sender<CreatureMessage>>,
+    sender_world: mpsc::Sender<WorldMessage>,
+
+    connected: bool,
     stream: TcpStream,
-    sender: Option<Sender<CreatureMessage>>
 }
 
 impl Client {
-    pub fn new(stream: TcpStream, sender: Sender<CreatureMessage>) -> Self {
+    pub fn new(stream: TcpStream, sender_world: mpsc::Sender<WorldMessage>) -> Self {
         Self {
+            sender_creature: None,
+            sender_world,
+
             stream,
-            run: true,
-            sender: Some(sender),
+            connected: true,
         }
     }
 
-    pub fn run(mut self, runtime: &Handle) {
-        runtime.spawn(async move {
-            while self.run {
-                self.update();
-            }
-        });
+    pub async fn run(mut self) {
+        while self.connected {
+            self.update().await;
+        }
     }
 
-    fn update(&mut self) {
-        self.update_stream();
+    async fn update(&mut self) {
+        if let Ok(message) = MessageClient::read(&mut self.stream) {
+            self.update_message(message).await;
+        } else {
+            self.connected = false;
+        }
     }
 
-    fn update_stream(&mut self) {
-        let mut message = Message::default();
-        message.read(&mut self.stream);
-        let message = serde_json::from_slice::<MessageClient>(&message.get()).expect("Unable to get message from client");
-
-
+    async fn update_message(&mut self, message: MessageClient){
         match message {
             MessageClient::SetDirection(direction) => {
-                if let Some(sender) = &self.sender {
-                    sender.send(CreatureMessage::SetDirection(direction)).expect("Unable to send message");
+                if let Some(sender_creature) = &mut self.sender_creature {
+                    CreatureMessage::request(sender_creature, CreatureRequest::SetDirection(direction)).unwrap();
                 } else {
-                    println!("Account doesn't have a creature controller");
+                    println!("creature doesn't exists");
+                }
+            }
+            MessageClient::GetCreatures => {
+                if let Ok(WorldResponse::GetCreatures(creatures)) = WorldMessage::request(&mut self.sender_world, WorldRequest::GetCreatures).unwrap().await {
+                    MessageServer::Creatures(creatures).write(&mut self.stream).unwrap();
+                }
+            }
+            MessageClient::Spawn => {
+                if let Ok(WorldResponse::Spawn(sender_creature)) = WorldMessage::request(&mut self.sender_world, WorldRequest::Spawn).unwrap().await {
+                    self.sender_creature = Some(sender_creature);
+                } else {
+                    self.sender_creature = None;
                 }
             }
         }

@@ -1,33 +1,34 @@
-use std::io::Read;
+use std::io;
+use std::io::{Read, Write};
 use std::net::TcpStream;
+use serde::{Deserialize, Serialize};
 
-const HEADER_SIZE: usize = core::mem::size_of::<u32>();
+type HeaderType = u32;
+const HEADER_SIZE: usize = core::mem::size_of::<HeaderType>();
 
-#[derive(Default)]
-pub struct Message {
-    header: [u8; HEADER_SIZE],
-    body: Vec<u8>,
+/// TODO: Change blocking sockets for non-blocking, so at least server won't be blocked while reading
+pub trait Message: Sized + Serialize + for<'a>Deserialize<'a> {
+    fn read(stream: &mut TcpStream) -> Result<Self, io::Error> {
+        Ok(serde_json::from_slice(&get_body(stream)?).expect("unable to decode message"))
+    }
+    fn write(&self, stream: &mut TcpStream) -> io::Result<()> {
+        let body = serde_json::to_vec(self).expect("unable to serialize message");
+        let length = (body.len() as u32).to_be_bytes();
+
+        stream.write(&length)?;
+        stream.write(&body)?;
+        Ok(())
+    }
 }
-impl Message {
-    fn get_length(&self) -> usize {
-        u32::from_be_bytes(self.header) as usize
-    }
 
-    fn read_header(&mut self, stream: &mut TcpStream) {
-        stream.read_exact(&mut self.header).expect("unable to read header");
-    }
+pub fn get_length(stream: &mut TcpStream) -> io::Result<usize> {
+    let mut header_bytes = [0; HEADER_SIZE];
+    stream.read_exact(&mut header_bytes)?;
+    Ok(HeaderType::from_be_bytes(header_bytes) as usize)
+}
 
-    fn read_body(&mut self, stream: &mut TcpStream) {
-        self.body = vec![0; self.get_length()];
-        stream.read_exact(&mut self.body).expect("unable to read body");
-    }
-
-    pub fn read(&mut self, stream: &mut TcpStream) {
-        self.read_header(stream);
-        self.read_body(stream);
-    }
-
-    pub fn get(&self) -> &Vec<u8> {
-        &self.body
-    }
+pub fn get_body(stream: &mut TcpStream) -> io::Result<Vec<u8>> {
+    let mut body = vec![0; get_length(stream)?];
+    stream.read_exact(&mut body)?;
+    Ok(body)
 }
