@@ -1,77 +1,40 @@
+use tokio::runtime::Runtime;
+use tokio::signal;
+use tokio::sync::oneshot;
+use sandcore_world::world::World;
+use crate::api;
+
 mod client;
 
-use std::net::{TcpListener, ToSocketAddrs};
-use std::sync::mpsc;
-use std::thread;
-use std::time::{Duration, Instant};
-use tokio::runtime::{Handle, Runtime};
-use client::Client;
-use crate::world::World;
+pub fn run() {
+    let world = World::new();
 
-use crate::world::message::Message as WorldMessage;
-use crate::world::message::Request as WorldRequest;
-use crate::world::message::Response as WorldResponse;
+    let (shutdown_sender, shutdown_receiver) = oneshot::channel();
 
-pub struct Server {
-    listener: TcpListener,
-    world: World,
+    let server = std::thread::spawn(move ||{run_server(shutdown_sender)});
+    let world = std::thread::spawn(move ||{run_world(shutdown_receiver, world)});
+
+    server.join().unwrap();
+    world.join().unwrap();
 }
 
 
-impl Server {
-    pub fn new<A: ToSocketAddrs>(addr: A) -> Self {
-        let listener = TcpListener::bind(addr).expect("unable to bind listener");
-        let world = World::new();
-
-
-        Self {
-            listener,
-            world,
-        }
-    }
-
-    pub fn run(mut self) {
-        let Self {
-            listener,
-            world,
-        } = self;
-
-        let world_sender = world.get_sender();
-
-        let world_handle = thread::spawn(move || {
-            println!("world started");
-            run_world(world);
-        });
-
-        let listener_handle =  thread::spawn(move || {
-            println!("listener started");
-            run_listener(listener, world_sender);
-        });
-
-        world_handle.join().unwrap();
-        listener_handle.join().unwrap();
-    }
+fn run_server(shutdown_sender: oneshot::Sender<bool>) {
+    let runtime = Runtime::new().unwrap();
+    runtime.block_on(async move {
+        let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+        axum::serve(listener, api::routes()).with_graceful_shutdown(shutdown_signal()).await.unwrap();
+        shutdown_sender.send(true).unwrap();
+    });
 }
 
-fn run_listener(listener: TcpListener, mut sender_world: mpsc::Sender<WorldMessage>) {
-    let runtime = Runtime::new().expect("unable to create runtime");
-
-    for stream in listener.incoming() {
-        if let Ok(stream) = stream {
-            println!("accepted");
-            let client = Client::new(stream, sender_world.clone());
-            runtime.spawn(client.run());
-        }
-    }
-}
-
-fn run_world(mut world: World) {
+fn run_world(mut shutdown_receiver: oneshot::Receiver<bool>, mut world: World) {
     loop {
-        //let time = Instant::now();
         world.update();
-
-        //let elapsed = time.elapsed().as_secs_f64();
-        //if elapsed < 1.0 / 20.0 { thread::sleep(Duration::from_secs_f64(1.0 / 20.0 - elapsed)); }
-        //println!("{}", time.elapsed().as_secs_f64());
+        if let Ok(_) = shutdown_receiver.try_recv() { break }
     }
+}
+
+async fn shutdown_signal() {
+    signal::ctrl_c().await.expect("failed to install Ctrl+C handler");
 }

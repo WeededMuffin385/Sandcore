@@ -1,16 +1,21 @@
 [workspace]
 members = [
     "sandcore_core",
-    "sandcore_client",
+    "sandcore_world",
     "sandcore_server",
 ]
 
 [workspace.dependencies]
 tokio = {version = "1.36.0", features = ["full", "net"]}
+
 euclid = {version = "0.22.9", features = ["serde"]}
+rand = "0.8.5"
 serde = "1.0.197"
 serde_json = "1.0.114"
-rand = "0.8.5"
+
 
 [workspace.dependencies.sandcore_core]
 path = "sandcore_core"
+
+[workspace.dependencies.sandcore_world]
+path = "sandcore_world"

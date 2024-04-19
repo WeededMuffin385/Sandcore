@@ -10,5 +10,14 @@ tokio = {workspace = true}
 serde = {workspace = true}
 euclid = {workspace = true}
 serde_json = {workspace = true}
-sandcore_core = {workspace = true}
 
+
+
+
+sandcore_core = {workspace = true}
+sandcore_world = {workspace = true}
+
+
+[dependencies.axum]
+version = "0.7.5"
+features = ["tokio", "ws"]
