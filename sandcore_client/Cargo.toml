@@ -1,0 +1,14 @@
+[package]
+name = "sandcore_client"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = {workspace = true}
+
+egui = "0.25.0"
+macroquad = "0.4.4"
+egui-macroquad = {git = "https://github.com/optozorax/egui-macroquad.git"}
+rand = "0.9.0-alpha.1"

@@ -1,19 +1,15 @@
-use crate::world::creature::Creature;
-pub mod creature;
-pub mod ai;
-pub mod message;
+use crate::world::creatures::Creatures;
 
+pub mod message;
+mod creatures;
+
+
+#[derive(Default)]
 pub struct World {
-	creatures: Vec<Creature>
+	pub creatures: Creatures
 }
 
 impl World {
-	pub fn new() -> Self {
-		Self {
-			creatures: Default::default(),
-		}
-	}
-
 	pub fn update(&mut self) {
 
 	}

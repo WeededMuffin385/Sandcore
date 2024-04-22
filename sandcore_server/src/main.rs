@@ -1,7 +1,5 @@
 mod server;
-mod api;
-
 
 fn main() {
-    server::run();
+    println!("Hello, world!");
 }

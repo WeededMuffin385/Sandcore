@@ -2,7 +2,9 @@
 members = [
     "sandcore_core",
     "sandcore_world",
+
     "sandcore_server",
+    "sandcore_client",
 ]
 
 [workspace.dependencies]
@@ -10,6 +12,7 @@ tokio = {version = "1.36.0", features = ["full", "net"]}
 
 euclid = {version = "0.22.9", features = ["serde"]}
 rand = "0.8.5"
+
 serde = "1.0.197"
 serde_json = "1.0.114"
 
