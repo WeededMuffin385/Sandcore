@@ -6,9 +6,7 @@ use egui::{CentralPanel, Color32, Context, Frame, Rect, Ui, Vec2};
 use crate::app::scenes::connection_menu::ConnectionMenu;
 use crate::app::scenes::main_menu::MainMenu;
 use crate::app::scenes::multiplayer_menu::server::Server;
-use crate::app::scenes::scene::Scene;
-use crate::app::scenes::Scenes;
-use crate::app::scenes::state::State;
+use crate::app::scenes::scene::{Scene, SceneMessage};
 
 pub struct MultiplayerMenu{
 	servers: Vec<Server>,
@@ -25,16 +23,16 @@ impl MultiplayerMenu {
 }
 
 impl Scene for  MultiplayerMenu {
-	fn update(&mut self, state: &mut State) {
+	fn update(&mut self, sender: &mut Sender<SceneMessage>) {
 
 	}
-	fn update_ui(&mut self, state: &mut State, ctx: &Context) {
-		update_side_panel(ctx, state, &mut self.servers, &mut self.selected);
-		update_central_panel(ctx, state, &mut self.servers, &mut self.selected);
+	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
+		update_side_panel(ctx, sender, &mut self.servers, &mut self.selected);
+		update_central_panel(ctx, sender, &mut self.servers, &mut self.selected);
 	}
 }
 
-fn update_central_panel(ctx: &egui::Context, state: &mut State, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
+fn update_central_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
 	CentralPanel::default().show(ctx, |ui|{
 		egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
 			for (index, server) in servers.iter().enumerate() {
@@ -42,7 +40,7 @@ fn update_central_panel(ctx: &egui::Context, state: &mut State, servers: &mut Ve
 					ui.horizontal(|ui| {
 						let size = [ui.available_width() * 0.6, 20.0];
 						if ui.add_sized(size, egui::widgets::Button::new(format!("{} [{}]", &server.name, &server.address))).clicked() {
-							state.next_scene = Some(Box::new(ConnectionMenu::new(server.address.clone())))
+							sender.send(SceneMessage::ChangeScene(Box::new(ConnectionMenu::new(server.address.clone())))).unwrap();
 						}
 
 						let size = [ui.available_width(), 20.0];
@@ -57,7 +55,7 @@ fn update_central_panel(ctx: &egui::Context, state: &mut State, servers: &mut Ve
 	});
 }
 
-fn update_side_panel(ctx: &egui::Context, state: &mut State, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
+fn update_side_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
 	let width = ctx.available_rect().width() * 0.2;
 
 	egui::SidePanel::right("right_panel").exact_width(width).show(ctx, |ui| {
@@ -89,7 +87,7 @@ fn update_side_panel(ctx: &egui::Context, state: &mut State, servers: &mut Vec<S
 
 		ui.vertical_centered_justified(|ui|{
 			if ui.button("Save'n'back").clicked() {
-				state.next_scene = Some(Box::new(MainMenu::new()));
+				sender.send(SceneMessage::ChangeScene(Box::new(MainMenu::new()))).unwrap();
 			}
 		})
 	});

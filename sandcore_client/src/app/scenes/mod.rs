@@ -4,7 +4,7 @@ pub mod settings_menu;
 pub mod scene;
 pub mod connection_menu;
 mod gameplay;
-mod state;
+mod message;
 
 use std::sync::mpsc;
 use macroquad::color::BLUE;
@@ -13,41 +13,46 @@ use crate::app::scenes::main_menu::MainMenu;
 use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
 use crate::app::scenes::scene::Scene;
 use crate::app::scenes::settings_menu::SettingsMenu;
-use crate::app::scenes::state::State;
+use crate::app::scenes::message::Message;
 
 pub struct Scenes {
-	scene: Option<Box<dyn Scene>>,
+	scene: Box<dyn Scene>,
+	sender: mpsc::Sender<Message>,
+	receiver: mpsc::Receiver<Message>,
 }
 
 impl Scenes {
 	pub async fn update(&mut self) {
-		let mut state = State::default();
-
 		clear_background(BLUE);
-		if let Some(scene) = &mut self.scene {
-			scene.update(&mut state);
-			egui_macroquad::ui(|ctx| {
-				scene.update_ui(&mut state, ctx);
-			});
-			egui_macroquad::draw();
-		}
+		self.scene.update(&mut self.sender);
+		egui_macroquad::ui(|ctx| {
+			self.scene.update_ui(&mut self.sender, ctx);
+		});
+		egui_macroquad::draw();
 		next_frame().await;
 
-		if let Some(next_scene) = state.next_scene {
-			self.scene = Some(next_scene);
+		if let Ok(message) = self.receiver.try_recv() {
+			match message {
+				Message::ChangeScene(scene) => {self.scene = scene}
+			}
 		}
 	}
 
 	pub fn push<T: Scene + 'static>(&mut self, scene: T) {
-		self.scene = Some(Box::new(scene));
+		self.scene = Box::new(scene);
 	}
 }
 
 
 impl Default for Scenes {
 	fn default() -> Self {
+		let (sender, receiver) = mpsc::channel();
+		let scene = Box::new(MainMenu::new());
+
 		Self {
-			scene: None,
+			scene,
+			sender,
+			receiver,
 		}
 	}
 }

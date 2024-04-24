@@ -3,7 +3,10 @@ use sandcore_core::dialogue::Dialogue;
 
 #[derive(Debug)]
 pub enum Request{
-	SetDirection(Vector2D<f32>),
+	SetMove {
+		direction: Vector2D<f32>,
+		speed: f32,
+	},
 }
 
 #[derive(Debug)]

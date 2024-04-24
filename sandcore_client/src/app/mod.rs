@@ -27,12 +27,9 @@ impl Default for App {
 			cfg.set_pixels_per_point(3.0);
 		});
 
-		let mut scenes: Scenes = Default::default();
-		scenes.push(MainMenu::new());
-
 		Self {
 			assets: Default::default(),
-			scenes,
+			scenes: Default::default(),
 		}
 	}
 }

@@ -1,5 +1,6 @@
 mod connection_state;
 
+use std::sync::mpsc::Sender;
 use tokio::io;
 use tokio::net::ToSocketAddrs;
 use tokio::runtime::Runtime;
@@ -7,8 +8,7 @@ use tokio::sync::oneshot;
 use crate::app::scenes::connection_menu::connection_state::ConnectionState;
 use crate::app::scenes::gameplay::Gameplay;
 use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
-use crate::app::scenes::scene::Scene;
-use crate::app::scenes::state::State;
+use crate::app::scenes::scene::{Scene, SceneMessage};
 use crate::server::Server;
 
 pub struct ConnectionMenu {
@@ -21,8 +21,7 @@ impl ConnectionMenu {
 		let (sender, receiver) = oneshot::channel();
 
 		std::thread::spawn(move ||{
-			let mut runtime = Runtime::new().unwrap();
-			sender.send(runtime.block_on(Server::new(addr))).unwrap();
+			sender.send(Server::new(addr)).unwrap();
 		});
 
 		Self {
@@ -33,17 +32,17 @@ impl ConnectionMenu {
 }
 
 impl Scene for ConnectionMenu {
-	fn update(&mut self, state: &mut State) {
+	fn update(&mut self, sender: &mut Sender<SceneMessage>) {
 		if let Ok(server) = self.receiver.try_recv() {
 			if let Ok(server) = server {
-				state.next_scene = Some(Box::new(Gameplay::new(server)));
+				sender.send(SceneMessage::ChangeScene(Box::new(Gameplay::new(server)))).unwrap();
 				self.connection_state = ConnectionState::Success
 			} else {
 				self.connection_state = ConnectionState::Failure
 			}
 		}
 	}
-	fn update_ui(&mut self, state: &mut State, ctx: &egui::Context) {
+	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &egui::Context) {
 		egui::TopBottomPanel::top("top_panel").show(ctx, |ui|{
 			ui.vertical_centered(|ui|{
 				ui.heading("Connection");
@@ -53,7 +52,7 @@ impl Scene for ConnectionMenu {
 		egui::TopBottomPanel::bottom("bottom_panel").show(ctx, |ui|{
 			ui.vertical_centered(|ui|{
 				if ui.button("cancel").clicked() {
-					state.next_scene = Some(Box::new(MultiplayerMenu::new()));
+					sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::new()))).unwrap();
 				}
 			});
 		});

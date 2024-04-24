@@ -8,7 +8,7 @@ members = [
 ]
 
 [workspace.dependencies]
-tokio = {version = "1.36.0", features = ["full", "net"]}
+tokio = {version = "1.36.0", features = ["full"]}
 
 euclid = {version = "0.22.9", features = ["serde"]}
 rand = "0.8.5"

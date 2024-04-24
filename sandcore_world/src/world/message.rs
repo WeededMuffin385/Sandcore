@@ -1,8 +1,7 @@
-use std::collections::HashMap;
 use std::sync::mpsc::Sender;
 use euclid::default::Point2D;
 use sandcore_core::dialogue::Dialogue;
-use crate::world::creature::message::Message as CreatureMessage;
+use crate::world::creatures::creature::message::Message as CreatureMessage;
 
 #[derive(Debug)]
 pub enum Request {

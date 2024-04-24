@@ -1,8 +1,9 @@
 use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use crate::app::scenes::Scenes;
-use crate::app::scenes::state::State;
+pub use crate::app::scenes::message::Message as SceneMessage;
 
 pub trait Scene{
-	fn update(&mut self, state: &mut State);
-	fn update_ui(&mut self, state: &mut State, ctx: &egui::Context);
+	fn update(&mut self, sender: &mut Sender<SceneMessage>);
+	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &egui::Context);
 }

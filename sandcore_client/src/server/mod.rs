@@ -1,6 +1,5 @@
-use tokio::net::ToSocketAddrs;
-use tokio::io;
-use tokio::net::TcpStream;
+use std::io;
+use std::net::{TcpStream, ToSocketAddrs};
 
 #[derive(Debug)]
 pub struct Server {
@@ -8,8 +7,8 @@ pub struct Server {
 }
 
 impl Server {
-	pub async fn new(addr: impl ToSocketAddrs) -> io::Result<Self> {
-		let stream = TcpStream::connect(addr).await?;
+	pub fn new(addr: impl ToSocketAddrs) -> io::Result<Self> {
+		let stream = TcpStream::connect(addr)?;
 
 		Ok(Self {
 			stream,

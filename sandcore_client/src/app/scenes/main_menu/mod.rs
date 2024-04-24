@@ -6,7 +6,7 @@ use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
 use crate::app::scenes::scene::Scene;
 use crate::app::scenes::Scenes;
 use crate::app::scenes::settings_menu::SettingsMenu;
-use crate::app::scenes::state::State;
+use crate::app::scenes::message::Message as SceneMessage;
 
 pub struct MainMenu{
 }
@@ -19,16 +19,16 @@ impl MainMenu {
 }
 
 impl Scene for MainMenu {
-	fn update(&mut self, state: &mut State) {
+	fn update(&mut self, sender: &mut Sender<SceneMessage>) {
 
 	}
 	
-	fn update_ui(&mut self, state: &mut State, ctx: &Context) {
-		update_panels(ctx, state);
+	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
+		update_panels(ctx, sender);
 	}
 }
 
-fn update_panels(ctx: &Context, state: &mut State) {
+fn update_panels(ctx: &Context, sender: &mut Sender<SceneMessage>) {
 	egui::TopBottomPanel::top("top_panel").show(ctx, |ui|{
 		ui.vertical_centered(|ui|{
 			ui.heading("Main Menu");
@@ -40,11 +40,11 @@ fn update_panels(ctx: &Context, state: &mut State) {
 
 		ui.vertical_centered(|ui|{
 			if ui.add_sized(button_size, egui::widgets::Button::new("Multiplayer")).clicked() {
-				state.next_scene = Some(Box::new(MultiplayerMenu::new()));
+				sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::new()))).unwrap();
 			}
 
 			if ui.add_sized(button_size, egui::widgets::Button::new("Settings")).clicked() {
-				state.next_scene = Some(Box::new(SettingsMenu::new()));
+				sender.send(SceneMessage::ChangeScene(Box::new(SettingsMenu::new()))).unwrap();
 			}
 
 			if ui.add_sized(button_size, egui::widgets::Button::new("Exit")).clicked() {

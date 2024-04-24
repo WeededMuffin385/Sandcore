@@ -5,10 +5,9 @@ use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use egui::{Context, Ui};
 use crate::app::scenes::main_menu::MainMenu;
-use crate::app::scenes::scene::Scene;
+use crate::app::scenes::scene::{Scene, SceneMessage};
 use crate::app::scenes::settings_menu::settings::Settings;
 use crate::app::scenes::settings_menu::tab::Tab;
-use crate::app::scenes::state::State;
 
 pub struct SettingsMenu{
 	tab: Tab,
@@ -25,12 +24,12 @@ impl SettingsMenu {
 }
 
 impl Scene for SettingsMenu {
-	fn update(&mut self, state: &mut State) {
+	fn update(&mut self, sender: &mut Sender<SceneMessage>) {
 
 	}
 
-	fn update_ui(&mut self, state: &mut State, ctx: &Context) {
-		update_side_panel(ctx, state, &mut self.tab);
+	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
+		update_side_panel(ctx, sender, &mut self.tab);
 		update_central_panel(ctx, &self.tab, &mut self.settings);
 	}
 }
@@ -46,7 +45,7 @@ fn update_central_panel(ctx: &Context, tab: &Tab, settings: &mut Settings) {
 	});
 }
 
-fn update_side_panel(ctx: &Context, state: &mut State, tab: &mut Tab) {
+fn update_side_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, tab: &mut Tab) {
 	egui::SidePanel::left("left_panel").exact_width(ctx.available_rect().width() * 0.2).show(ctx, |ui|{
 		let button_size = [ui.available_width(), 20.0];
 
@@ -65,7 +64,7 @@ fn update_side_panel(ctx: &Context, state: &mut State, tab: &mut Tab) {
 		ui.add_space(ui.available_height() - button_size[1]);
 
 		if ui.add_sized(button_size, egui::Button::new("Save'n'back")).clicked() {
-			state.next_scene = Some(Box::new(MainMenu::new()));
+			sender.send(SceneMessage::ChangeScene(Box::new(MainMenu::new()))).unwrap();
 		}
 	});
 }
