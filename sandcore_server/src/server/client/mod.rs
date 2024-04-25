@@ -44,6 +44,8 @@ impl Client {
 			match message {
 				MessageClient::MoveCreature {direction, speed} => {
 					if let Some(sender_creature) = &mut self.sender_creature {
+						println!("received");
+
 						creature_message::Message::request(sender_creature, creature_message::Request::SetMove{direction, speed}).unwrap();
 					}
 				}
@@ -53,9 +55,10 @@ impl Client {
 				}
 
 				MessageClient::Spawn => {
-					if let Ok(receiver) =  world_message::Message::request(&mut self.sender_world, world_message::Request::Spawn) {
-						if let Ok(Response::Spawn(sender_creature)) = receiver.await {
+					if let Ok(response) =  world_message::Message::request(&mut self.sender_world, world_message::Request::Spawn) {
+						if let Ok(Response::Spawn(sender_creature)) = response.await {
 							self.sender_creature = Some(sender_creature);
+							println!("spawned!");
 						}
 					}
 				}

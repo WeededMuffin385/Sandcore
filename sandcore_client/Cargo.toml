@@ -6,9 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+rand = {workspace = true}
 tokio = {workspace = true}
+sandcore_core = {workspace = true}
+euclid = {workspace = true}
 
-egui = "0.25.0"
+serde = {workspace = true}
+serde_json = {workspace = true}
+
+
+
+
+# Don't change to newer versions. Pretty dangerous tbh
+egui = { version = "0.25.0", features = ["serde"] }
 macroquad = "0.4.4"
 egui-macroquad = {git = "https://github.com/optozorax/egui-macroquad.git"}
-rand = "0.9.0-alpha.1"

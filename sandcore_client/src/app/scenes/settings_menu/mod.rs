@@ -12,6 +12,7 @@ use crate::app::scenes::settings_menu::tab::Tab;
 pub struct SettingsMenu{
 	tab: Tab,
 	settings: Settings,
+	last_button_height: f32,
 }
 
 impl SettingsMenu {
@@ -19,6 +20,7 @@ impl SettingsMenu {
 		Self {
 			tab: Default::default(),
 			settings: Default::default(),
+			last_button_height: Default::default(),
 		}
 	}
 }
@@ -29,7 +31,7 @@ impl Scene for SettingsMenu {
 	}
 
 	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
-		update_side_panel(ctx, sender, &mut self.tab);
+		update_side_panel(ctx, sender, &mut self.tab, &mut self.last_button_height);
 		update_central_panel(ctx, &self.tab, &mut self.settings);
 	}
 }
@@ -45,7 +47,7 @@ fn update_central_panel(ctx: &Context, tab: &Tab, settings: &mut Settings) {
 	});
 }
 
-fn update_side_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, tab: &mut Tab) {
+fn update_side_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, tab: &mut Tab, last_button_height: &mut f32) {
 	egui::SidePanel::left("left_panel").exact_width(ctx.available_rect().width() * 0.2).show(ctx, |ui|{
 		let button_size = [ui.available_width(), 20.0];
 
@@ -61,11 +63,15 @@ fn update_side_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, tab: &mut
 			*tab = Tab::Languages;
 		}
 
-		ui.add_space(ui.available_height() - button_size[1]);
+		ui.add_space(ui.available_height() - *last_button_height);
 
-		if ui.add_sized(button_size, egui::Button::new("Save'n'back")).clicked() {
-			sender.send(SceneMessage::ChangeScene(Box::new(MainMenu::new()))).unwrap();
-		}
+		ui.vertical_centered_justified(|ui|{
+			let begin = ui.next_widget_position();
+			if ui.button("Save'n'back").clicked() {
+				sender.send(SceneMessage::ChangeScene(Box::new(MainMenu::new()))).unwrap();
+			}
+			*last_button_height = (ui.next_widget_position() - begin).y;
+		});
 	});
 }
 

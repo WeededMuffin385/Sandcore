@@ -1,8 +1,12 @@
 mod server;
 
+use std::fs::{create_dir_all, File, read_to_string};
+use std::io::Write;
+use std::path::PathBuf;
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
-use egui::{CentralPanel, Color32, Context, Frame, Rect, Ui, Vec2};
+use egui::{Button, CentralPanel, Color32, Context, Frame, Rect, Ui, Vec2};
+use egui::epaint::tessellator::Path;
 use crate::app::scenes::connection_menu::ConnectionMenu;
 use crate::app::scenes::main_menu::MainMenu;
 use crate::app::scenes::multiplayer_menu::server::Server;
@@ -11,15 +15,8 @@ use crate::app::scenes::scene::{Scene, SceneMessage};
 pub struct MultiplayerMenu{
 	servers: Vec<Server>,
 	selected: Option<usize>,
-}
 
-impl MultiplayerMenu {
-	pub fn new() -> Self {
-		Self{
-			servers: Default::default(),
-			selected: Default::default(),
-		}
-	}
+	last_button_height: f32,
 }
 
 impl Scene for  MultiplayerMenu {
@@ -27,12 +24,12 @@ impl Scene for  MultiplayerMenu {
 
 	}
 	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
-		update_side_panel(ctx, sender, &mut self.servers, &mut self.selected);
+		update_side_panel(ctx, sender, &mut self.servers, &mut self.selected, &mut self.last_button_height);
 		update_central_panel(ctx, sender, &mut self.servers, &mut self.selected);
 	}
 }
 
-fn update_central_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
+fn update_central_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
 	CentralPanel::default().show(ctx, |ui|{
 		egui::ScrollArea::vertical().auto_shrink([false; 2]).show(ui, |ui| {
 			for (index, server) in servers.iter().enumerate() {
@@ -55,7 +52,7 @@ fn update_central_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, 
 	});
 }
 
-fn update_side_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>) {
+fn update_side_panel(ctx: &Context, sender: &mut Sender<SceneMessage>, servers: &mut Vec<Server>, selected: &mut Option<usize>, last_button_height: &mut f32) {
 	let width = ctx.available_rect().width() * 0.2;
 
 	egui::SidePanel::right("right_panel").exact_width(width).show(ctx, |ui| {
@@ -82,14 +79,17 @@ fn update_side_panel(ctx: &egui::Context, sender: &mut Sender<SceneMessage>, ser
 			}
 		});
 
-
-		ui.add_space(ui.available_height() - 20.0);
+		ui.add_space(ui.available_height() - *last_button_height);
 
 		ui.vertical_centered_justified(|ui|{
+			let begin = ui.next_widget_position();
 			if ui.button("Save'n'back").clicked() {
 				sender.send(SceneMessage::ChangeScene(Box::new(MainMenu::new()))).unwrap();
 			}
-		})
+			*last_button_height = (ui.next_widget_position() - begin).y;
+		});
+
+
 	});
 }
 
@@ -127,4 +127,29 @@ fn update_selected_settings(ui: &mut Ui, server: &mut Server, close: &mut bool, 
 	});
 
 	ui.color_edit_button_srgba(&mut server.color);
+}
+
+impl Drop for MultiplayerMenu {
+	fn drop(&mut self) {
+		if !PathBuf::from("assets/").exists() { create_dir_all("assets/").unwrap(); }
+
+		let data = serde_json::to_string(&self.servers).unwrap();
+		File::create("assets/servers.json").unwrap().write_all(data.as_ref()).unwrap();
+	}
+}
+
+impl Default for MultiplayerMenu {
+	fn default() -> Self {
+		let servers = if let Ok(data) = read_to_string("assets/servers.json") {
+			serde_json::from_str(&data).unwrap()
+		} else {
+			Default::default()
+		};
+
+		Self{
+			servers,
+			selected: Default::default(),
+			last_button_height: Default::default(),
+		}
+	}
 }

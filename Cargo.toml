@@ -9,13 +9,10 @@ members = [
 
 [workspace.dependencies]
 tokio = {version = "1.36.0", features = ["full"]}
-
 euclid = {version = "0.22.9", features = ["serde"]}
-rand = "0.8.5"
-
+rand = "0.9.0-alpha.1"
 serde = "1.0.197"
 serde_json = "1.0.114"
-
 
 [workspace.dependencies.sandcore_core]
 path = "sandcore_core"

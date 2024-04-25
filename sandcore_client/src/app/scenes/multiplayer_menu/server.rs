@@ -1,6 +1,9 @@
 use egui::Color32;
 use rand::Rng;
+use serde::{Deserialize, Serialize};
+use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
 
+#[derive(Serialize, Deserialize)]
 pub struct Server {
 	pub name: String,
 	pub address: String,

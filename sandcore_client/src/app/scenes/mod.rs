@@ -10,10 +10,8 @@ use std::sync::mpsc;
 use macroquad::color::BLUE;
 use macroquad::prelude::{clear_background, next_frame};
 use crate::app::scenes::main_menu::MainMenu;
-use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
-use crate::app::scenes::scene::Scene;
-use crate::app::scenes::settings_menu::SettingsMenu;
 use crate::app::scenes::message::Message;
+use crate::app::scenes::scene::Scene;
 
 pub struct Scenes {
 	scene: Box<dyn Scene>,
@@ -31,7 +29,7 @@ impl Scenes {
 		egui_macroquad::draw();
 		next_frame().await;
 
-		if let Ok(message) = self.receiver.try_recv() {
+		for message in self.receiver.try_iter() {
 			match message {
 				Message::ChangeScene(scene) => {self.scene = scene}
 			}

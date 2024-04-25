@@ -52,7 +52,7 @@ impl Scene for ConnectionMenu {
 		egui::TopBottomPanel::bottom("bottom_panel").show(ctx, |ui|{
 			ui.vertical_centered(|ui|{
 				if ui.button("cancel").clicked() {
-					sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::new()))).unwrap();
+					sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::default()))).unwrap();
 				}
 			});
 		});

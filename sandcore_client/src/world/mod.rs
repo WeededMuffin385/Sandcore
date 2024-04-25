@@ -1,4 +1,4 @@
 #[derive(Default)]
 pub struct World{
-	pub creatures: Vec<(f64, f64)>,
+	pub creatures: Vec<(f32, f32)>,
 }

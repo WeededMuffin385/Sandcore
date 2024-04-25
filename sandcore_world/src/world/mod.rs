@@ -2,6 +2,7 @@ use std::sync::mpsc::{channel, Receiver, Sender};
 use std::time::{Duration, Instant};
 use creatures::Creatures;
 use message::Message;
+use crate::world::message::{Request, Response};
 
 pub mod message;
 pub mod creatures;
@@ -27,11 +28,21 @@ impl World {
 		self.sender.clone()
 	}
 
-	pub fn run(mut self) {
-
+	pub fn update(&mut self, duration: &Duration) {
+		self.update_receiver();
+		self.creatures.update(duration);
 	}
 
-	pub fn update(&mut self, duration: &Duration) {
-		self.creatures.update(duration);
+	fn update_receiver(&mut self) {
+		for message in self.receiver.try_iter() {
+			match message.request {
+				Request::Spawn => {
+					message.response(Response::Spawn(self.creatures.spawn())).unwrap();
+				}
+				Request::GetCreatures => {
+
+				}
+			}
+		}
 	}
 }

@@ -40,7 +40,7 @@ fn update_panels(ctx: &Context, sender: &mut Sender<SceneMessage>) {
 
 		ui.vertical_centered(|ui|{
 			if ui.add_sized(button_size, egui::widgets::Button::new("Multiplayer")).clicked() {
-				sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::new()))).unwrap();
+				sender.send(SceneMessage::ChangeScene(Box::new(MultiplayerMenu::default()))).unwrap();
 			}
 
 			if ui.add_sized(button_size, egui::widgets::Button::new("Settings")).clicked() {

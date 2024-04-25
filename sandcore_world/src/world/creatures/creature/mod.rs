@@ -39,14 +39,11 @@ impl Creature {
 	}
 
 	fn update_receiver(&mut self) {
-		for message in &self.receiver {
+		for message in self.receiver.try_iter() {
 			match message.request {
 				Request::SetMove{direction, speed} => {
-					let direction = direction.normalize();
-					let speed = if speed.abs() > 1.0 {1.0} else {speed.abs()};
-
-					self.direction = direction;
-					self.speed = speed;
+					self.direction = if let Some(direction) = direction.try_normalize() {direction} else {Default::default()};
+					self.speed = if speed.abs() <= 1.0 {speed.abs()} else {1.0};
 				}
 			}
 		}
@@ -55,5 +52,7 @@ impl Creature {
 	fn update_move(&mut self, duration: &Duration) {
 		let delta = self.direction * duration.as_secs_f32() * self.speed;
 		self.position += delta;
+
+		println!("{:?}", self.position);
 	}
 }
