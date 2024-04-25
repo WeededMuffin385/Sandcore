@@ -3,6 +3,7 @@ use std::sync::mpsc::Sender;
 use tokio::net::TcpStream;
 use sandcore_core::message::Message;
 use sandcore_core::message_client::MessageClient;
+use sandcore_core::message_server::MessageServer;
 use sandcore_world::world::creatures::creature::message as creature_message;
 use sandcore_world::world::message as world_message;
 use sandcore_world::world::message::Response;
@@ -50,8 +51,12 @@ impl Client {
 					}
 				}
 
-				MessageClient::RequestCreatures => {
-
+				MessageClient::Creatures => {
+					if let Ok(response) = world_message::Message::request(&mut self.sender_world, world_message::Request::Creatures) {
+						if let Ok(Response::Creatures(creatures)) = response.await {
+							MessageServer::Creatures(creatures).write(&mut self.stream).await.unwrap();
+						}
+					}
 				}
 
 				MessageClient::Spawn => {

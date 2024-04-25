@@ -39,8 +39,8 @@ impl World {
 				Request::Spawn => {
 					message.response(Response::Spawn(self.creatures.spawn())).unwrap();
 				}
-				Request::GetCreatures => {
-
+				Request::Creatures => {
+					message.response(Response::Creatures(self.creatures.get_creatures())).unwrap();
 				}
 			}
 		}

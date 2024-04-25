@@ -4,7 +4,7 @@ use crate::message::Message;
 
 #[derive(Serialize, Deserialize)]
 pub enum MessageClient {
-	RequestCreatures,
+	Creatures,
 	MoveCreature{
 		direction: Vector2D<f32>,
 		speed: f32,

@@ -35,9 +35,11 @@ fn run_listener(sender_world: Sender<world_message::Message>) {
 
 fn run_world(mut world: World) {
 	let mut instant = Instant::now();
+	let mut current = Instant::now();
 
 	loop {
-		world.update(&instant.elapsed());
+		world.update(&current.elapsed());
+		current = instant;
 		instant = Instant::now();
 	}
 }

@@ -6,10 +6,12 @@ use euclid::default::{Point2D, Vector2D};
 use message::Message;
 use crate::world::creatures::creature::message::Request;
 
+const BASE_SPEED: f32 = 1.42;
+
 pub struct Creature {
-	speed: f32,
-	position: Point2D<f32>,
-	direction: Vector2D<f32>,
+	pub speed: f32,
+	pub position: Point2D<f32>,
+	pub direction: Vector2D<f32>,
 
 	sender: mpsc::Sender<Message>,
 	receiver: mpsc::Receiver<Message>,
@@ -50,7 +52,7 @@ impl Creature {
 	}
 
 	fn update_move(&mut self, duration: &Duration) {
-		let delta = self.direction * duration.as_secs_f32() * self.speed;
+		let delta = self.direction * duration.as_secs_f32() * self.speed * BASE_SPEED;
 		self.position += delta;
 
 		println!("{:?}", self.position);
