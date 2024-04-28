@@ -3,7 +3,6 @@ mod connection_state;
 use std::sync::mpsc::Sender;
 use tokio::io;
 use tokio::net::ToSocketAddrs;
-use tokio::runtime::Runtime;
 use tokio::sync::oneshot;
 use crate::app::scenes::connection_menu::connection_state::ConnectionState;
 use crate::app::scenes::gameplay::Gameplay;
@@ -62,7 +61,7 @@ impl Scene for ConnectionMenu {
 
 			ui.vertical_centered(|ui| {
 				match self.connection_state {
-					ConnectionState::Idle | ConnectionState::Process => {
+					ConnectionState::Process => {
 						let spinner = egui::widgets::Spinner::new().size(height).color(egui::Color32::from_rgb(0,0,255));
 						ui.add(spinner);
 					}

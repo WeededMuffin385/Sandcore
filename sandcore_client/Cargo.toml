@@ -8,12 +8,11 @@ edition = "2021"
 [dependencies]
 rand = {workspace = true}
 tokio = {workspace = true}
-sandcore_core = {workspace = true}
 euclid = {workspace = true}
-
 serde = {workspace = true}
 serde_json = {workspace = true}
 
+sandcore_protocol = {workspace = true}
 
 
 

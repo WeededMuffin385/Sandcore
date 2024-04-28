@@ -2,13 +2,11 @@ mod client;
 
 use std::sync::mpsc::Sender;
 use std::thread;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::net::TcpListener;
 use tokio::runtime::Runtime;
 use sandcore_world::world::{message as world_message, World};
 use crate::server::client::Client;
-
-struct Server;
 
 pub fn run() {
 	let world = World::new();
@@ -34,11 +32,38 @@ fn run_listener(sender_world: Sender<world_message::Message>) {
 }
 
 fn run_world(mut world: World) {
+	let mut instant_tps = Instant::now();
+	let mut tps = 0.0;
+
+	let mut output_tps = || {
+		let elapsed = instant_tps.elapsed().as_secs_f32();
+		if elapsed >= 1.0 {
+			println!("tps: {}", tps / elapsed);
+			instant_tps = Instant::now();
+			tps = 0.0;
+		}
+		tps += 1.0;
+	};
+
+
+	let target_tps = 60.0;
+	let target_duration = 1.0 / target_tps;
+
 	let mut instant = Instant::now();
 	let mut current = Instant::now();
 
 	loop {
+		output_tps();
+
+		let elapsed = current.elapsed().as_secs_f64();
+		if elapsed < target_duration {
+			let sleep_duration = Duration::from_secs_f64((target_duration - elapsed) * 2.0);
+			thread::sleep(sleep_duration);
+		}
+
+
 		world.update(&current.elapsed());
+
 		current = instant;
 		instant = Instant::now();
 	}

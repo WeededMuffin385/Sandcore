@@ -4,15 +4,14 @@ use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::runtime::Runtime;
 use tokio::sync::mpsc::*;
 use tokio::sync::mpsc::error::{TryRecvError, TrySendError};
-use sandcore_core::message::Message;
-use sandcore_core::message_client::MessageClient;
-use sandcore_core::message_server::MessageServer;
+use sandcore_protocol::message::asynchronous::Message;
+use sandcore_protocol::message_client::MessageClient;
+use sandcore_protocol::message_server::MessageServer;
 
 #[derive(Debug)]
 pub struct Server {
 	sender: Sender<MessageClient>,
 	receiver: Receiver<MessageServer>,
-
 	runtime: Runtime,
 }
 
@@ -22,15 +21,11 @@ impl Server {
 
 		let (reader, writer) = runtime.block_on(TcpStream::connect(addr))?.into_split();
 
-		let (sender, receiver_client) = channel(128);
-		let (sender_server, receiver) = channel(128);
+		let (sender, receiver_other) = channel(1024 * 8);
+		let (sender_other, receiver) = channel(1024 * 8);
 
-		runtime.spawn(async move {
-			handle_stream_read(reader, sender_server).await
-		});
-		runtime.spawn(async move {
-			handle_stream_write(writer, receiver_client).await
-		});
+		runtime.spawn(handle_stream_read(reader, sender_other));
+		runtime.spawn(handle_stream_write(writer, receiver_other));
 
 		Ok(Self{
 			sender,
@@ -48,7 +43,7 @@ impl Server {
 	}
 }
 
-async fn handle_stream_read(mut reader: OwnedReadHalf, mut sender: Sender<MessageServer>) {
+async fn handle_stream_read(mut reader: OwnedReadHalf, sender: Sender<MessageServer>) {
 	loop {
 		if let Ok(message) = MessageServer::read(&mut reader).await {
 			sender.send(message).await.unwrap();
@@ -58,7 +53,7 @@ async fn handle_stream_read(mut reader: OwnedReadHalf, mut sender: Sender<Messag
 
 async fn handle_stream_write(mut writer: OwnedWriteHalf, mut receiver: Receiver<MessageClient>) {
 	loop {
-		for message in receiver.recv().await {
+		if let Some(message) = receiver.recv().await {
 			message.write(&mut writer).await.unwrap();
 		}
 	}

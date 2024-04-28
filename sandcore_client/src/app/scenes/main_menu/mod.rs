@@ -1,10 +1,8 @@
-use std::sync::mpsc;
 use std::sync::mpsc::Sender;
 use egui::Context;
-use macroquad::miniquad::window::{order_quit, quit};
+use macroquad::miniquad::window::order_quit;
 use crate::app::scenes::multiplayer_menu::MultiplayerMenu;
 use crate::app::scenes::scene::Scene;
-use crate::app::scenes::Scenes;
 use crate::app::scenes::settings_menu::SettingsMenu;
 use crate::app::scenes::message::Message as SceneMessage;
 

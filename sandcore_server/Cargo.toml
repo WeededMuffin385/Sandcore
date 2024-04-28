@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 tokio = {workspace = true}
-sandcore_core = {workspace = true}
 sandcore_world = {workspace = true}
+sandcore_protocol = {workspace = true}

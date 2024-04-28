@@ -6,5 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+serde = {workspace = true}
 euclid = {workspace = true}
-sandcore_core = {workspace = true}
+sandcore_dialogue = {workspace = true}
+
+noise = "0.9.0"

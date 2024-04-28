@@ -1,10 +1,11 @@
 [workspace]
+resolver = "2"
 members = [
-    "sandcore_core",
     "sandcore_world",
-
-    "sandcore_server",
     "sandcore_client",
+    "sandcore_server",
+    "sandcore_protocol",
+    "sandcore_dialogue",
 ]
 
 [workspace.dependencies]
@@ -14,8 +15,11 @@ rand = "0.9.0-alpha.1"
 serde = "1.0.197"
 serde_json = "1.0.114"
 
-[workspace.dependencies.sandcore_core]
-path = "sandcore_core"
-
 [workspace.dependencies.sandcore_world]
 path = "sandcore_world"
+
+[workspace.dependencies.sandcore_dialogue]
+path = "sandcore_dialogue"
+
+[workspace.dependencies.sandcore_protocol]
+path = "sandcore_protocol"

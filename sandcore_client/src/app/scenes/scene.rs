@@ -1,6 +1,4 @@
-use std::sync::mpsc;
 use std::sync::mpsc::Sender;
-use crate::app::scenes::Scenes;
 pub use crate::app::scenes::message::Message as SceneMessage;
 
 pub trait Scene{

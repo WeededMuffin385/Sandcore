@@ -1,4 +1,4 @@
 #[derive(Default)]
 pub struct Settings {
-	pub font_size: f32,
+	pub render_distance: usize,
 }

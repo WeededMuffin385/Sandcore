@@ -1,17 +1,20 @@
 pub mod message;
+pub mod position;
 
 use std::sync::*;
-use std::time::{Duration, Instant};
-use euclid::default::{Point2D, Vector2D};
+use std::time::Duration;
+use euclid::default::*;
 use message::Message;
-use crate::world::creatures::creature::message::Request;
+use crate::world::creatures::creature::message::{Request, Response};
+use crate::world::creatures::creature::position::Position;
 
-const BASE_SPEED: f32 = 1.42;
+const WALK_SPEED: f32 = 1.42;
+const RUN_SPEED: f32 = 7.15;
 
 pub struct Creature {
 	pub speed: f32,
-	pub position: Point2D<f32>,
-	pub direction: Vector2D<f32>,
+	pub position: Position,
+	pub direction: Vector3D<f32>,
 
 	sender: mpsc::Sender<Message>,
 	receiver: mpsc::Receiver<Message>,
@@ -43,18 +46,19 @@ impl Creature {
 	fn update_receiver(&mut self) {
 		for message in self.receiver.try_iter() {
 			match message.request {
-				Request::SetMove{direction, speed} => {
+				Request::Move{direction, speed} => {
 					self.direction = if let Some(direction) = direction.try_normalize() {direction} else {Default::default()};
 					self.speed = if speed.abs() <= 1.0 {speed.abs()} else {1.0};
+				}
+				Request::Position => {
+					message.response(Response::Position(self.position.clone())).unwrap()
 				}
 			}
 		}
 	}
 
 	fn update_move(&mut self, duration: &Duration) {
-		let delta = self.direction * duration.as_secs_f32() * self.speed * BASE_SPEED;
+		let delta = self.direction * duration.as_secs_f32() * self.speed * RUN_SPEED;
 		self.position += delta;
-
-		println!("{:?}", self.position);
 	}
 }

@@ -1,18 +1,20 @@
-use euclid::default::Vector2D;
-use sandcore_core::dialogue::Dialogue;
+use euclid::default::*;
+use sandcore_dialogue::dialogue::Dialogue;
+use crate::world::creatures::creature::position::Position;
 
 #[derive(Debug)]
 pub enum Request{
-	SetMove {
-		direction: Vector2D<f32>,
+	Move {
+		direction: Vector3D<f32>,
 		speed: f32,
 	},
+
+	Position,
 }
 
 #[derive(Debug)]
 pub enum Response{
-	Ok,
-	Err,
+	Position(Position),
 }
 
 pub type Message = Dialogue<Request, Response>;

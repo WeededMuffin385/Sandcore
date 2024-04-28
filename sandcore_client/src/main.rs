@@ -1,5 +1,4 @@
 mod server;
-mod assets;
 mod world;
 mod app;
 

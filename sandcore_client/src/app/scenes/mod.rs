@@ -35,10 +35,6 @@ impl Scenes {
 			}
 		}
 	}
-
-	pub fn push<T: Scene + 'static>(&mut self, scene: T) {
-		self.scene = Box::new(scene);
-	}
 }
 
 
