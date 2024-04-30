@@ -27,6 +27,7 @@ async fn get_length<A: AsyncReadExt + Unpin>(reader: &mut A) -> Result<usize> {
 	Ok(HeaderType::from_be_bytes(header_bytes) as usize)
 }
 
+
 async fn get_body<A: AsyncReadExt + Unpin>(reader: &mut A) -> Result<Vec<u8>> {
 	let mut body = vec![0; get_length(reader).await?];
 	reader.read_exact(&mut body).await?;
@@ -34,5 +35,8 @@ async fn get_body<A: AsyncReadExt + Unpin>(reader: &mut A) -> Result<Vec<u8>> {
 }
 
 
+#[cfg(feature = "async")]
 impl Message for MessageServer {}
+
+#[cfg(feature = "async")]
 impl Message for MessageClient {}

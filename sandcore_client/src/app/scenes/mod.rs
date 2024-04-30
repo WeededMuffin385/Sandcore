@@ -8,7 +8,7 @@ mod message;
 
 use std::sync::mpsc;
 use macroquad::color::BLUE;
-use macroquad::prelude::{clear_background, next_frame};
+use macroquad::prelude::{BLACK, clear_background, next_frame};
 use crate::app::scenes::main_menu::MainMenu;
 use crate::app::scenes::message::Message;
 use crate::app::scenes::scene::Scene;
@@ -21,7 +21,8 @@ pub struct Scenes {
 
 impl Scenes {
 	pub async fn update(&mut self) {
-		clear_background(BLUE);
+		clear_background(BLACK);
+
 		self.scene.update(&mut self.sender);
 		egui_macroquad::ui(|ctx| {
 			self.scene.update_ui(&mut self.sender, ctx);

@@ -4,7 +4,7 @@ use std::sync::mpsc::Sender;
 use std::thread;
 use std::time::{Duration, Instant};
 use tokio::net::TcpListener;
-use tokio::runtime::Runtime;
+use tokio::runtime::Builder;
 use sandcore_world::world::{message as world_message, World};
 use crate::server::client::Client;
 
@@ -20,7 +20,7 @@ pub fn run() {
 }
 
 fn run_listener(sender_world: Sender<world_message::Message>) {
-	let runtime = Runtime::new().unwrap();
+	let runtime = Builder::new_current_thread().enable_all().build().unwrap();
 
 	runtime.block_on(async {
 		let listener = TcpListener::bind("127.0.0.1:3030").await.unwrap();
@@ -36,7 +36,7 @@ fn run_world(mut world: World) {
 	let mut tps = 0.0;
 
 	let mut output_tps = || {
-		let elapsed = instant_tps.elapsed().as_secs_f32();
+		let elapsed = instant_tps.elapsed().as_secs_f64();
 		if elapsed >= 1.0 {
 			println!("tps: {}", tps / elapsed);
 			instant_tps = Instant::now();
@@ -46,23 +46,21 @@ fn run_world(mut world: World) {
 	};
 
 
-	let target_tps = 60.0;
+	let target_tps = 64.0;
 	let target_duration = 1.0 / target_tps;
 
 	let mut instant = Instant::now();
-	let mut current = Instant::now();
+	let mut current = instant;
 
 	loop {
 		output_tps();
+		world.update(&current.elapsed());
 
 		let elapsed = current.elapsed().as_secs_f64();
 		if elapsed < target_duration {
-			let sleep_duration = Duration::from_secs_f64((target_duration - elapsed) * 2.0);
+			let sleep_duration = Duration::from_secs_f64(target_duration - elapsed);
 			thread::sleep(sleep_duration);
 		}
-
-
-		world.update(&current.elapsed());
 
 		current = instant;
 		instant = Instant::now();

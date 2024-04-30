@@ -18,6 +18,7 @@ pub struct Renderer {
 	pub camera: Camera,
 
 	pub radius: isize,
+	pub depth: usize,
 }
 
 impl Renderer {
@@ -32,7 +33,7 @@ impl Renderer {
 
 	fn draw(&self, world: &World) {
 		self.camera.set_camera();
-		clear_background(BLUE);
+		clear_background(BLACK);
 		self.draw_blocks(world);
 		self.draw_creatures(world);
 		self.camera.draw_buffer();
@@ -48,24 +49,24 @@ impl Renderer {
 	}
 
 	fn draw_blocks(&self, world: &World) {
-		for x in -self.radius..=self.radius {
-			for y in -self.radius..=self.radius {
-				let offset = Vector3D::new(x, y, 0);
-				let position_world = self.camera.position.position_world + offset;
+		for r in 0..self.radius {
+			for z in -1..=0 {
+				for x in -r..=r {
+					for y in -r..=r {
+						let offset = Vector3D::new(x, y, z);
+						let position_world = self.camera.position.position_world + offset;
 
-				if let Some(chunk) = world.blocks.chunks.get(&position_world) {
-					self.draw_chunk(&offset, chunk);
+
+						if let Some(chunk) = world.blocks.chunks.get(&position_world) {
+							self.draw_chunk(&offset, chunk);
+						}
+					}
 				}
 			}
 		}
 	}
 
 	fn draw_chunk(&self, offset: &Vector3D<isize>, chunk: &Chunk) {
-		let next = &chunk.data;
-
-		let offset_x = (offset.x * CHUNK_SIZE as isize) as f32;
-		let offset_y = (offset.y * CHUNK_SIZE as isize) as f32;
-
 		let mut meshes: [Mesh; CHUNK_SIZE] = [
 			Mesh{ vertices: vec![], indices: vec![], texture: None},
 			Mesh{ vertices: vec![], indices: vec![], texture: None},
@@ -85,10 +86,21 @@ impl Renderer {
 			Mesh{ vertices: vec![], indices: vec![], texture: None},
 		];
 
+		let next = &chunk.data;
+
+		let offset_x = (offset.x * CHUNK_SIZE as isize) as f32;
+		let offset_y = (offset.y * CHUNK_SIZE as isize) as f32;
+
 		for (x, next) in next.iter().enumerate() {
 			for (y, next) in next.iter().enumerate() {
 				for (z, block) in next.iter().enumerate().rev() {
-					if z != self.camera.position.position_chunk.z as usize {continue}
+					let depth = self.camera.position.position_chunk.z as isize - z as isize - offset.z * CHUNK_SIZE as isize;
+					if depth.is_negative() {continue}
+					if depth >= self.depth as isize {continue}
+
+					let shade = 1.0 - depth as f32 / self.depth as f32;
+					let shade_color = Color::new(1.0 * shade, 1.0 * shade, 1.0 * shade, 1.0);
+
 
 					if *block == Block::Vacuum {continue}
 					let entry = &mut meshes[z];
@@ -98,11 +110,11 @@ impl Renderer {
 					let offset = entry.vertices.len();
 
 					entry.vertices.extend([
-						Vertex{ position: vec3(0.0 + x, 0.0 + y, 0.0), uv: vec2(0.0, 0.0), color: WHITE},
-						Vertex{ position: vec3(0.0 + x, 1.0 + y, 0.0), uv: vec2(0.0, 1.0), color: WHITE},
+						Vertex{ position: vec3(0.0 + x, 0.0 + y, 0.0), uv: vec2(0.0, 0.0), color: shade_color},
+						Vertex{ position: vec3(0.0 + x, 1.0 + y, 0.0), uv: vec2(0.0, 1.0), color: shade_color},
 
-						Vertex{ position: vec3(1.0 + x, 1.0 + y, 0.0), uv: vec2(1.0, 1.0), color: WHITE},
-						Vertex{ position: vec3(1.0 + x, 0.0 + y, 0.0), uv: vec2(1.0, 0.0), color: WHITE},
+						Vertex{ position: vec3(1.0 + x, 1.0 + y, 0.0), uv: vec2(1.0, 1.0), color: shade_color},
+						Vertex{ position: vec3(1.0 + x, 0.0 + y, 0.0), uv: vec2(1.0, 0.0), color: shade_color},
 					]);
 
 					entry.indices.extend([
@@ -113,8 +125,7 @@ impl Renderer {
 			}
 		}
 
-
-		for mesh in &meshes {
+		for mesh in meshes.iter() {
 			draw_mesh(mesh);
 		}
 	}
@@ -126,7 +137,8 @@ impl Default for Renderer {
 			assets: Default::default(),
 			camera: Default::default(),
 
-			radius: 8,
+			radius: 6,
+			depth: 8,
 		}
 	}
 }

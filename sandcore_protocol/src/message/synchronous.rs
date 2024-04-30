@@ -33,6 +33,6 @@ fn get_body<A: Read>(reader: &mut A) -> Result<Vec<u8>> {
 	Ok(body)
 }
 
-
 impl Message for MessageServer {}
+
 impl Message for MessageClient {}

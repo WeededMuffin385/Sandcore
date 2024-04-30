@@ -74,17 +74,19 @@ impl Gameplay {
 
 	fn update_chunk_request(&mut self) {
 		for r in 0..self.renderer.radius {
-			for x in -r..=r {
-				for y in -r..=r {
-					if self.chunks_pending == 1 { return }
+			for z in -1..=0 {
+				for x in -r..=r {
+					for y in -r..=r {
+						if self.chunks_pending == 1 { return }
 
-					let offset = Vector3D::new(x, y, 0);
-					let position_world = self.renderer.camera.position.position_world + offset;
+						let offset = Vector3D::new(x, y, z);
+						let position_world = self.renderer.camera.position.position_world + offset;
 
-					if self.world.blocks.requested.contains(&position_world).not() {
-						self.server.try_send(MessageClient::Chunk(position_world)).unwrap();
-						self.world.blocks.requested.insert(position_world);
-						self.chunks_pending += 1;
+						if self.world.blocks.requested.contains(&position_world).not() {
+							self.server.try_send(MessageClient::Chunk(position_world)).unwrap();
+							self.world.blocks.requested.insert(position_world);
+							self.chunks_pending += 1;
+						}
 					}
 				}
 			}
@@ -128,6 +130,8 @@ impl Scene for Gameplay {
 	}
 
 	fn update_ui(&mut self, sender: &mut Sender<SceneMessage>, ctx: &Context) {
-
+		egui::SidePanel::left("left_panel").default_width(ctx.available_rect().width() * 0.2).resizable(true).show(ctx, |ui|{
+			ui.label(format!("{:?}", self.renderer.camera.position.position_chunk));
+		});
 	}
 }

@@ -1,12 +1,11 @@
 pub mod scenes;
 
 use std::time::Instant;
+use macroquad::prelude::{get_fps, get_frame_time};
 use crate::app::scenes::Scenes;
 
 pub struct App {
 	scenes: Scenes,
-
-	tps: f64,
 	instant: Instant,
 }
 
@@ -17,14 +16,10 @@ impl App {
 
 	pub async fn run(mut self) {
 		loop {
-			let elapsed = self.instant.elapsed().as_secs_f64();
-			if  elapsed >= 1.0 {
-				println!("tps: {}", self.tps / elapsed);
+			if self.instant.elapsed().as_secs() >= 1 {
+				println!("fps: {}", get_fps());
 				self.instant = Instant::now();
-				self.tps = 0.0;
 			}
-			self.tps += 1.0;
-
 
 			self.update().await;
 		}
@@ -41,7 +36,6 @@ impl Default for App {
 
 		Self {
 			scenes: Default::default(),
-			tps: 0.0,
 			instant: Instant::now(),
 		}
 	}
