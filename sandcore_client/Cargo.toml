@@ -12,7 +12,7 @@ euclid = {workspace = true}
 serde = {workspace = true}
 serde_json = {workspace = true}
 
-sandcore_protocol = { workspace = true, features = ["sync"] }
+sandcore_protocol = { workspace = true }
 
 
 

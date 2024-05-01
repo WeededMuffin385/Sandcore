@@ -2,11 +2,11 @@ use std::io;
 use tokio::net::{TcpStream, ToSocketAddrs};
 use tokio::net::tcp::{OwnedReadHalf, OwnedWriteHalf};
 use tokio::runtime::Runtime;
-use tokio::sync::mpsc::*;
 use tokio::sync::mpsc::error::{TryRecvError, TrySendError};
-use sandcore_protocol::message::asynchronous::Message;
+use tokio::sync::mpsc::*;
 use sandcore_protocol::message_client::MessageClient;
 use sandcore_protocol::message_server::MessageServer;
+use sandcore_protocol::message::Message;
 
 #[derive(Debug)]
 pub struct Server {
@@ -21,8 +21,8 @@ impl Server {
 
 		let (reader, writer) = runtime.block_on(TcpStream::connect(addr))?.into_split();
 
-		let (sender, receiver_other) = channel(1024 * 8);
-		let (sender_other, receiver) = channel(1024 * 8);
+		let (sender, receiver_other) = channel(1024);
+		let (sender_other, receiver) = channel(1024);
 
 		runtime.spawn(handle_stream_read(reader, sender_other));
 		runtime.spawn(handle_stream_write(writer, receiver_other));

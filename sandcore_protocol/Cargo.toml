@@ -12,7 +12,3 @@ euclid = {workspace = true}
 sandcore_world = {workspace = true}
 
 bincode = "1.3.3"
-
-[features]
-async = []
-sync = []

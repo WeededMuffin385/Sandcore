@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 use std::sync::mpsc::Sender;
 use tokio::net::TcpStream;
-use sandcore_protocol::message::asynchronous::Message;
+use sandcore_protocol::message::Message;
 use sandcore_protocol::message_client::MessageClient;
 use sandcore_protocol::message_server::MessageServer;
 
