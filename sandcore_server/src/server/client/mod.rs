@@ -19,15 +19,12 @@ pub struct Client {
 
 
 impl Client {
-	pub fn new(connection: (TcpStream, SocketAddr), sender_world: Sender<world_message::Message>) -> Self {
-		let (stream, addr) = connection;
-		println!("client connected from: {:?}", addr);
-		let connected = true;
-
+	pub fn new(stream: TcpStream, sender_world: Sender<world_message::Message>) -> Self {
 		Self {
 			stream,
-			connected,
 			sender_world,
+
+			connected: true,
 			sender_creature: None,
 		}
 	}

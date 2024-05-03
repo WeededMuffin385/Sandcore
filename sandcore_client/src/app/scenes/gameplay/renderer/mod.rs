@@ -1,7 +1,7 @@
 mod camera;
 mod assets;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::ops::Not;
 use euclid::default::{Point3D, Vector3D};
 use macroquad::color::WHITE;
@@ -91,6 +91,8 @@ impl Renderer {
 		let offset_x = (offset.x * CHUNK_SIZE as isize) as f32;
 		let offset_y = (offset.y * CHUNK_SIZE as isize) as f32;
 
+		let mut drawn = [[false; CHUNK_SIZE]; CHUNK_SIZE];
+
 		for (x, next) in next.iter().enumerate() {
 			for (y, next) in next.iter().enumerate() {
 				for (z, block) in next.iter().enumerate().rev() {
@@ -101,8 +103,10 @@ impl Renderer {
 					let shade = 1.0 - depth as f32 / self.depth as f32;
 					let shade_color = Color::new(1.0 * shade, 1.0 * shade, 1.0 * shade, 1.0);
 
-
 					if *block == Block::Vacuum {continue}
+					if drawn[x][y] {continue}
+					drawn[x][y] = true;
+
 					let entry = &mut meshes[z];
 					let x = x as f32 + offset_x;
 					let y = y as f32 + offset_y;

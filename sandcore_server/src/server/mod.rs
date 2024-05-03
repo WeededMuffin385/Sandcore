@@ -25,7 +25,10 @@ fn run_listener(sender_world: Sender<world_message::Message>) {
 	runtime.block_on(async {
 		let listener = TcpListener::bind("127.0.0.1:3030").await.unwrap();
 		loop {
-			let client = Client::new(listener.accept().await.unwrap(), sender_world.clone());
+			let (stream, addr) = listener.accept().await.unwrap();
+			println!("client connected from: {:?}", addr);
+
+			let client = Client::new(stream, sender_world.clone());
 			tokio::spawn(async move { client.run().await });
 		}
 	});
