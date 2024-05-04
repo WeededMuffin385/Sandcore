@@ -1,2 +1,2 @@
 # Sandcore
-Written in rust. Space MMO.
+Sandcore is a client-server multiplayer sandbox game.
